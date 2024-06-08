@@ -45,7 +45,7 @@ df = pd.DataFrame({
     'Cluster': cluster
 })
 
-df.to_csv('dataset.csv')
+df.to_csv('dataset.csv', sep = ' ', index = False)
 
 plt.scatter(X, Y, c=colors)
 plt.xlim(-40, 40)
