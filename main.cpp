@@ -25,11 +25,13 @@ int main() {
     }
     fin.close();
 
-    // kmeans time
-    KMeans kmeans(5);
-    kmeans.fit(coordinates);
+    // // kmeans time
+    // KMeans kmeans(5, "kmeans++");
+    // kmeans.fit(coordinates);
 
-    for(std::array<double, 2> centroid : kmeans._centroids) {
-        std::cout << centroid << "\n";
-    }
+    // for(std::array<double, 2> centroid : kmeans._centroids) {
+    //     std::cout << centroid << "\n";
+    // }
+
+    
 }

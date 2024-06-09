@@ -19,6 +19,7 @@ class KMeans {
         std::string init_typ;
         std::vector<std::array<double, 2>> _data;
         std::vector<int> _identify_nearest();
+        std::array<double, 2> _next_center(std::vector<std::array<double, 2>> centroids); 
 };
 
 KMeans::KMeans(int K, std::string typ = "random") {
@@ -36,23 +37,6 @@ void KMeans::rand_init_centroids() {
     }
 }
 
-void KMeans::plus_init_centroids() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, _data.size() - 1);
-
-    _centroids.push_back(_data[dis(gen)]);
-
-    auto next_center = [](std::vector<std::array<double, 2>> centroids) {
-        
-    };
-
-    for(int i = 1; i < _K; i++) {
-        _centroids.push_back(next_center(centroids));
-    }
-    
-}
-
 std::vector<int> KMeans::_identify_nearest() {
     std::vector<int> C(_data.size());
     for(size_t i = 0; i < _data.size(); i++) {
@@ -68,6 +52,41 @@ std::vector<int> KMeans::_identify_nearest() {
         C[i] = std::min_element(_centroids.begin(), _centroids.end(), comp) - _centroids.begin();
     }
     return C;
+}
+
+void KMeans::plus_init_centroids() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, _data.size() - 1);
+
+    _centroids.push_back(_data[dis(gen)]);
+
+    auto next_center = [&](const std::vector<std::array<double, 2>>& centroids) {
+        std::vector<int> distances = _identify_nearest();
+        std::vector<double> probabilities(_data.size());
+
+        double total_weight = 0.0;
+        for(size_t i = 0; i < _data.size(); i++) {
+            probabilities[i] = distances[i] * distances[i];
+            total_weight += probabilities[i];
+        }
+
+        for(size_t i = 0; i < probabilities.size(); i++) {
+            probabilities[i] /= total_weight;
+        }
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::discrete_distribution distribution(probabilities.begin(), probabilities.end());
+
+        int rand_index = distribution(gen);
+        return _data[rand_index];
+    };
+
+    for(int i = 1; i < _K; i++) {
+        _centroids.push_back(next_center(_centroids));
+    }
+
 }
 
 void KMeans::fit(const std::vector<std::array<double, 2>> &data) {
